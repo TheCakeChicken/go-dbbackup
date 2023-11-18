@@ -1,4 +1,4 @@
-module alyx.pw/dbbackup
+module github.com/thecakechicken/dbbackup
 
 go 1.18
 
