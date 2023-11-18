@@ -1,0 +1,25 @@
+cron_interval: "0 0 * * * *"
+heartbeat_uri: ""
+
+s3_config:
+  access_key: ""
+  access_secret: ""
+  region: "eu-west-2"
+  bucket: ""
+
+databases:
+  -
+    host: "127.0.0.1"
+    port: 3306
+    username: "db_username"
+    password: "db_password"
+    names:
+      - "database1"
+      - "database2"
+
+  -
+    host: "other.db.host"
+    port: 3306
+    username: "db_username"
+    password: "db_password"
+    name: "*" # Wildcard, will dump all databases on the server
