@@ -202,28 +202,52 @@ func runBackups(config Config) {
 
 			backupTime := time.Now().Format("2006-01-02_15-04-05")
 
-			exportName := fmt.Sprintf("%s_%s_%s", backupTime, db.Host, dbName)
+			exportName := fmt.Sprintf("%s_%s_on_%s_%s", backupTime, db.Engine, db.Host, dbName)
 
-			if dbName == "*" {
-				dbName = "--all-databases"
-				exportName = fmt.Sprintf("%s_%s_all-databases", backupTime, db.Host)
-			}
+			if (db.Engine == "mariadb") || (db.Engine == "mysql") {
+				if dbName == "*" {
+					dbName = "--all-databases"
+					exportName = fmt.Sprintf("%s_%s_all-databases", backupTime, db.Host)
+				}
 
-			hostArg := fmt.Sprintf("--host=%s", db.Host)
-			portArg := fmt.Sprintf("--port=%d", db.Port)
-			usernameArg := fmt.Sprintf("--user=%s", db.Username)
-			passwordArg := fmt.Sprintf("--password=%s", db.Password)
-			outputArg := fmt.Sprintf("--result-file=./backups/%s.sql", exportName)
+				hostArg := fmt.Sprintf("--host=%s", db.Host)
+				portArg := fmt.Sprintf("--port=%d", db.Port)
+				usernameArg := fmt.Sprintf("--user=%s", db.Username)
+				passwordArg := fmt.Sprintf("--password=%s", db.Password)
+				outputArg := fmt.Sprintf("--result-file=./backups/%s.sql", exportName)
 
-			files = append(files, fmt.Sprintf("backups/%s.sql", exportName))
+				files = append(files, fmt.Sprintf("backups/%s.sql", exportName))
 
-			// TODO: Check if --column-statistics=0 is needed (Needed on MySQL 8.0.17+, flag not available in MariaDB mysqldump)
-			cmd := exec.Command("mysqldump", hostArg, portArg, usernameArg, passwordArg, outputArg, "--extended-insert", "--single-transaction=TRUE", dbName)
-			_, err := cmd.Output()
+				// TODO: Check if --column-statistics=0 is needed (Needed on MySQL 8.0.17+, flag not available in MariaDB mysqldump)
+				cmd := exec.Command("mysqldump", hostArg, portArg, usernameArg, passwordArg, outputArg, "--extended-insert", "--single-transaction=TRUE", dbName)
+				_, err := cmd.Output()
 
-			if err != nil {
-				log.Printf("Error running backup: %s\n", err.Error())
-				continue
+				if err != nil {
+					log.Printf("Error running backup: %s\n", err.Error())
+					continue
+				}
+			} else if db.Engine == "mongodb" {
+				dbArg := fmt.Sprintf("--db=%s", dbName)
+				if dbName == "*" {
+					dbArg = ""
+					exportName = fmt.Sprintf("%s_%s_all-databases", backupTime, db.Host)
+				}
+
+				hostArg := fmt.Sprintf("--host=%s", db.Host)
+				portArg := fmt.Sprintf("--port=%d", db.Port)
+				usernameArg := fmt.Sprintf("--user=%s", db.Username)
+				passwordArg := fmt.Sprintf("--password=%s", db.Password)
+				outputArg := fmt.Sprintf("--out=./backups/%s", exportName)
+
+				files = append(files, fmt.Sprintf("backups/%s.gz", exportName))
+
+				cmd := exec.Command("mongodump", hostArg, portArg, usernameArg, passwordArg, dbArg, outputArg, "--gzip")
+				_, err := cmd.Output()
+
+				if err != nil {
+					log.Printf("Error running backup: %s\n", err.Error())
+					continue
+				}
 			}
 		}
 	}
