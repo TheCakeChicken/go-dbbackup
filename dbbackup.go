@@ -24,6 +24,7 @@ import (
 
 // Hold the individual database configurations
 type DatabaseConfig struct {
+	Engine   string   `yaml:"engine"`
 	Host     string   `yaml:"host"`
 	Port     int      `yaml:"port"`
 	Username string   `yaml:"username"`
@@ -197,7 +198,7 @@ func runBackups(config Config) {
 		}
 
 		for _, dbName := range db.DBNames {
-			log.Printf("Backing up database %s on host %s\n", dbName, db.Host)
+			log.Printf("Backing up %s database %s on host %s\n", db.Engine, dbName, db.Host)
 
 			backupTime := time.Now().Format("2006-01-02_15-04-05")
 

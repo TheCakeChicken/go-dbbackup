@@ -9,6 +9,7 @@ s3_config:
 
 databases:
   -
+    engine: "mysql"
     host: "127.0.0.1"
     port: 3306
     username: "db_username"
@@ -18,8 +19,19 @@ databases:
       - "database2"
 
   -
+    engine: "mysql"
     host: "other.db.host"
     port: 3306
     username: "db_username"
     password: "db_password"
     name: "*" # Wildcard, will dump all databases on the server
+
+  -
+    engine: "mongodb"
+    host: "127.0.0.1"
+    port: 27017
+    username: "root"
+    password: "db_password"
+    names:
+      - "database1"
+      - "database2"
