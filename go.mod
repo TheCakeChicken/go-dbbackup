@@ -1,4 +1,4 @@
-module github.com/thecakechicken/dbbackup
+module github.com/thecakechicken/go-dbbackup
 
 go 1.18
 
